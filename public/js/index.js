@@ -1,4 +1,23 @@
 var socket = io();
+
+function scrollToBottom() {
+	// Selectors
+	const messages = $('#messages');
+	const newMessage = messages.children('li:last-child');
+	//Heights
+	const clientHeight = messages.prop('clientHeight');
+	const scrollTop = messages.prop('scrollTop');
+	const scrollHeight = messages.prop('scrollHeight');
+	const newMessageHeight = newMessage.innerHeight();
+	const lastMessageHeight = newMessage.prev().innerHeight();
+	
+	
+	if (clientHeight + scrollTop + lastMessageHeight + newMessageHeight  >= scrollHeight) {
+		messages.scrollTop(scrollHeight);
+	}
+}
+
+
 socket.on('connect', function() {
 	console.log('connected to server');
 	
@@ -11,6 +30,7 @@ socket.on('connect', function() {
 });
 
 const locationButton = $('#send-location');
+var messageInput = $('[name=message]');
 
 socket.on('createMessage', function(message) {
 	console.log(message);
@@ -30,10 +50,9 @@ socket.on('newMessage', function(message) {
 	});
 	
 	$('#messages').append(html);
-	
+	scrollToBottom();
 	/*
-	console.log(message);
-	
+	console.log(message);	
 	var li = $('<li></li>');
 	li.text(`${message.from} ${formatTime}: ${message.text}`);	
 	$('#messages').append(li);
@@ -51,6 +70,7 @@ socket.on('newLocationMessage', function(message) {
 	});
 	$('#messages').append(html);
 	locationButton.removeAttr('disabled').text('Send Location');	
+	scrollToBottom();
 	/*
 	var li = $('<li></li>');
 	var a = $('<a target="_blank">My current location</a>');	
@@ -60,14 +80,13 @@ socket.on('newLocationMessage', function(message) {
 });
 
 $('#message-form').on('submit', function(event) {
-	event.preventDefault();
-	
-	var messageInput = $('[name=message]');
+	event.preventDefault();		
 	socket.emit('createMessage', {
 		from: 'User',
 		text: messageInput.val()
 	}, function() {
 		messageInput.val('');
+		messageInput.focus();
 	});
 });
 
@@ -76,14 +95,12 @@ locationButton.on('click', function() {
 		return alert('Gelocation not supported by your browser');
 	}
 	
-	locationButton.attr('disabled', 'disabled').text('Finding Location');
-
+	locationButton.attr('disabled', 'disabled').text('Finding Location');	
 	window.navigator.geolocation.getCurrentPosition(function (position) {
 		socket.emit('createLocationMessage', {
 			latitude: position.coords.latitude,
 			longitude: position.coords.longitude
 		});
-		console.log(position);
 	}, function () {
 		locationButton.removeAttr('disabled').text('Send Location');
 		alert('Unable to fetch location');
