@@ -19,14 +19,15 @@ function scrollToBottom() {
 
 
 socket.on('connect', function() {
-	console.log('connected to server');
-	
-/*socket.emit('createMessage', {
-		from: 'newUser@newuser.com',
-		text: 'New User'
-	}, function(message) {
-		console.log(message);
-	});	*/	
+	var params = $.deparam(window.location.search);
+	socket.emit('join', params, function(err) {
+		if (err) {
+			alert(err);
+			window.location.href = '/';
+		} else {
+			console.log('No error');
+		}
+	});
 });
 
 const locationButton = $('#send-location');

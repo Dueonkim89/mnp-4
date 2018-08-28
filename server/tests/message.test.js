@@ -1,6 +1,7 @@
 const expect = require('expect');
 
 const { generateMessage, generateLocationMessage } = require('./../message');
+const { isRealString } = require('./../validation');
 
 describe('generateMessage', () => {
 	it('should generate correct message object', () => {
@@ -10,7 +11,6 @@ describe('generateMessage', () => {
 		expect(typeof (message.createdAt)).toBe('number');
 	});
 });
-
 
 describe('generateLocationMessage', () => {
 	it('should generate correct location object', () => {
@@ -22,4 +22,21 @@ describe('generateLocationMessage', () => {
 		expect(locMessage.url).toBe(url);
 		expect(typeof (locMessage.createdAt)).toBe('number');
 	});
+});
+
+describe('isRealString', () => {
+	it('should reject non string values',() => {
+		var res = isRealString(98);
+		expect(res).toBe(false);
+	});
+	
+	it('should reject string with only spaces',() => {
+		var res = isRealString('  ');
+		expect(res).toBe(false);
+	});	
+	
+	it('should allow string with non-space characters',() => {
+		var res = isRealString('abc');
+		expect(res).toBe(true);
+	});		
 });
