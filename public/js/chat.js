@@ -92,7 +92,6 @@ socket.on('newLocationMessage', function(message) {
 $('#message-form').on('submit', function(event) {
 	event.preventDefault();		
 	socket.emit('createMessage', {
-		from: 'User',
 		text: messageInput.val()
 	}, function() {
 		messageInput.val('');
